@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Web Text Editor</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            overflow: hidden; /* Hide any scrollbars */
+        }
+
+        #editor-container {
+            display: flex;
+            position: absolute;
+            top: 40px;
+            right: 0;
+            bottom: 0;
+            left: 0;
+        }
+
+        #editor {
+            flex: 1;
+            width: 100%;
+            height: 100%;
+            border: none;
+            outline: none;
+            font-family: Consolas, Monaco, 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 20px;
+            padding: 20px;
+            padding-top: 33px;
+            background: #272822;
+            color: #FFF;
+            overflow-y: scroll;
+            white-space: nowrap; /* Disable word wrapping */
+        }
+
+        #line-numbers {
+            width: 35px;
+            height: 100%;
+            border-right: 1px solid #333;
+            background: #272822;
+            color: #FFF;
+            font-family: Consolas, Monaco, 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 20px;
+            padding: 20px 0;
+            padding-left: 20px;
+            padding-bottom: 50px;
+            cursor: default;
+        }
+    </style>
+</head>
+<body>
+    <div id="editor-container">
+        <div id="line-numbers">
+            <pre id="line-numbers-content"></pre>
+        </div>
+        <textarea id="editor"></textarea>
+    </div>
+
+    <script>
+        const editor = document.getElementById('editor');
+        const lineNumbersContent = document.getElementById('line-numbers-content');
+
+        // Function to update the line numbers and sync their position
+        function updateLineNumbers() {
+            const lines = editor.value.split('\n');
+            const lineNumbersHTML = lines.map((line, index) => {
+                return index + 1;
+            }).join('\n');
+            lineNumbersContent.textContent = lineNumbersHTML;
+        }
+
+        // Function to sync line numbers with the editor scroll
+        function syncLineNumbersScroll() {
+            lineNumbersContent.style.transform = `translateY(-${editor.scrollTop}px)`;
+        }
+
+        // Add event listener for input and scroll
+        editor.addEventListener('input', () => {
+            updateLineNumbers();
+        });
+        editor.addEventListener('scroll', syncLineNumbersScroll);
+
+        // Event listener for Enter key press to update line numbers
+        editor.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                setTimeout(() => {
+                    updateLineNumbers();
+                    syncLineNumbersScroll();
+                }, 0);
+            }
+        });
+
+        // Initial update of line numbers and sync with editor scroll
+        updateLineNumbers();
+        syncLineNumbersScroll();
+
+        // Load the saved content from localStorage when the page loads
+        const savedContent = localStorage.getItem('editorContent');
+        if (savedContent) {
+            editor.value = savedContent;
+            updateLineNumbers();
+            syncLineNumbersScroll();
+        }
+    </script>
+</body>
+</html>
